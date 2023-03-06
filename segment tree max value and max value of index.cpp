@@ -96,19 +96,40 @@ void build(ll b, ll e, ll node) {
 		index[node] = index[right];
 	}
 }
-pl query(ll node,ll b,ll e,ll l,ll r){
-	 if(l>e||r<b) return {-1,-1};
-	 if(b>=l&&e<=r) {
-	 	return {index[node],tree[node]};
-	 }
-	 ll mid=(b+e)/2;
-	 pl p1=query(node*2,b,mid,l,r);
-	 pl p2=query(node*2+1,mid+1,e,l,r);
-	 if(p1.F==-1&&p2.F==-1) return {-1,-1};
-     if(p1.F==-1) return p2;
-     if(p2.F==-1) return p1;
-     if(p1.S>p2.S) return p1;
-     else return p2;
+void update(ll b, ll e, ll pos, ll value, ll node) {
+	if (pos < b || pos > e) return;
+	if (pos <= b && pos >= e) {
+		tree[node] = value;
+		index[node] = pos;
+		return;
+	}
+	ll mid, left, right;
+	mid = (b + e) / 2;
+	left = node * 2;
+	right = node * 2 + 1;
+	update(b, mid, pos, value, left);
+	update(mid + 1, e, pos, value, right);
+	if (tree[left] > tree[right]) {
+		tree[node] = tree[left];
+		index[node] = index[left];
+	} else {
+		tree[node] = tree[right];
+		index[node] = index[right];
+	}
+}
+pl query(ll node, ll b, ll e, ll l, ll r) {
+	if (l > e || r < b) return { -1, -1};
+	if (b >= l && e <= r) {
+		return {index[node], tree[node]};
+	}
+	ll mid = (b + e) / 2;
+	pl p1 = query(node * 2, b, mid, l, r);
+	pl p2 = query(node * 2 + 1, mid + 1, e, l, r);
+	if (p1.F == -1 && p2.F == -1) return { -1, -1};
+	if (p1.F == -1) return p2;
+	if (p2.F == -1) return p1;
+	if (p1.S > p2.S) return p1;
+	else return p2;
 }
 int main() {
 	int test = 1, fac = 1;
@@ -118,13 +139,21 @@ int main() {
 		cin >> n;
 		for (i = 1; i <= n; i++)  cin >> a[i];
 		build(1, n, 1);
-	      ll q;
+		ll q;
 		cin >> q;
 		while (q--) {
-			ll l,r;
-			cin >> l >> r;
-			pl p = query(1, 1, n, l, r);
-			cout << p.F << " " << p.S << endl;
+			ll t;
+			cin >> t;
+			if (t == 1) {
+				ll l, r;
+				cin >> l >> r;
+				pl p = query(1, 1, n, l, r);
+				cout << p.F << " " << p.S << endl;
+			}else{
+				 ll pos,val;
+				 cin>>pos>>val;
+				  update(1, n, pos, val, 1);
+			}
 		}
 	}
 	return 0;
